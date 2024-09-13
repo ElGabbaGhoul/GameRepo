@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset = "UTF-8">
+        <meta name = "viewport" content="width=device-width, initial-scale=1.0">
+        <title>Tic Tac Toe</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div class="game">
+            <h1>Tic Tac Toe</h1>
+            <div class="grid">
+                <div class="cell" data-row="0" data-col="0"></div>
+                <div class="cell" data-row="0" data-col="1"></div>
+                <div class="cell" data-row="0" data-col="2"></div>
+                <div class="cell" data-row="1" data-col="0"></div>
+                <div class="cell" data-row="1" data-col="1"></div>
+                <div class="cell" data-row="1" data-col="2"></div>
+                <div class="cell" data-row="2" data-col="0"></div>
+                <div class="cell" data-row="2" data-col="1"></div>
+                <div class="cell" data-row="2" data-col="2"></div>
+            </div>
+            <button id="create-game">Create Game</button>
+            <button id="join-game">Join Game</button>
+            <input type="text" id="game-id" placeholder="Enter Game ID">
+            <div id="status"></div>
+        </div>
+
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+            const socket = io();
+            const cells = document.querySelectorAll('.cell');
+            const createGameButton = document.getElementById('create-game');
+            const joinGameButton = document.getElementById('join-game');
+            const gameIdInput = document.getElementById('game-id');
+            const statusDiv = document.getElementById('status');
+            let currentPlayer = 'X';
+            let gameId;
+
+            // Create new game
+
+            createGameButton.addEventListener('click', ()=> {
+                socket.emit('createGame');
+            });
+
+            socket.on('gameCreated', (id) => {
+                gameId = id;
+                statusDiv.textContent = 'Game Created! Game ID: ' + id;
+            });
+
+            // Join existing game
+
+            joinGameButton.addEventListener('click', () => {
+                const id = gameIdInput.value;
+                socet.emit('joinGame', id);
+            });
+
+            socket.on('gameJoined', (game) => {
+                gameId = gameIdInput.value;
+                updateBoard(game);
+            });
+
+            cells.forEach(cell => {
+                cell.addEventListener('click', () => {
+                    const row = cell.getAttribute('data-row');
+                    const col = cell.getAttribute('data-col');
+                    socket.emit('makeMove', row, col);
+                })
+            })
+
+            // update Board
+
+            socket.on('gameUpdate', (game) => {
+                updateBoard(game)
+                currentPlayer = game.currentPlayer;
+            })
+            
+            function updateBoard(game) {
+                cells.forEach(cell => {
+                    const row = cell.getAttribute('data-row')
+                    const col = cell.getAttribute('data-col')
+                    cell.textContent = game.board[row][col]
+                });
+                statusDiv.textContent = 'Current Player: ' + game.currentPlayer;
+            }
+        </script>
+    </body>
+</html>
