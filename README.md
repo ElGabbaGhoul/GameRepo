@@ -48,4 +48,11 @@ Click on Create game to get a roomId. Share this roomId with your friends to pla
 
 1. Clone the repository:
    ```bash
-   {Replace with: `git clone <repository-url>`}
+   `git clone https://github.com/ElGabbaGhoul/GameRepo.git`
+2. Install dependencies:
+   `npm i` or `npm install`
+3. Start the server on your machine:
+   `node server.js`
+4. Open the project in your browser:
+   `http://localhost:3000`
+   This is the default port. To change the port, change the server.listen line at the bottom of server.js.
